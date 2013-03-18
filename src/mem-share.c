@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <errno.h>
 
 #include "mem-share.h"
 
@@ -52,7 +53,7 @@ IPC_FD shm_chn_add(int max_buf_size)
     {
         g_shm_id[g_chn_indx]= shmget(g_shmkey[g_chn_indx], max_buf_size, 0777| IPC_CREAT);
         if(-1== g_shm_id[g_chn_indx]){
-            printf("share memory get error!\n");
+            printf("share memory get error! err:%s\n",strerror(errno));
             goto err;
         }
 
@@ -73,6 +74,57 @@ IPC_FD shm_chn_add(int max_buf_size)
     }
 
     return g_chn_indx++;
+err:
+    return -1;
+}
+/* add one transfer channel. */
+int shm_uinit()
+{
+    int ret, tmp_indx;
+    struct shmid_ds buf;
+
+    if(0== g_work_model)
+    {
+        for(tmp_indx=0; tmp_indx< MAX_NODE_NUM; tmp_indx++)
+        {
+            void *mem_ret;
+            printf("tmp_index = %d\n",tmp_indx);
+            g_shm_id[tmp_indx]= shmget(g_shmkey[tmp_indx], sizeof(SHARE_BUF_NODE), 0777| IPC_CREAT| IPC_EXCL);
+            if(-1== g_shm_id[tmp_indx]){
+                if(errno== EEXIST){
+//                    printf("share memory get error!\n");
+//                    printf("err: %s\n",strerror(errno));
+                    g_shm_id[tmp_indx]= shmget(g_shmkey[tmp_indx], sizeof(SHARE_BUF_NODE), 0777| IPC_CREAT);
+                    mem_ret= shmat(g_shm_id[g_chn_indx], 0, 0);
+                    if((void *)-1== mem_ret){
+                        printf("share memory attach address error\n");
+                    }
+
+                    ret= shmctl(g_shm_id[tmp_indx], IPC_RMID, 0);
+                    if(-1== ret){
+                        printf("delete share memory false!\n");
+                        printf("err: %s\n", strerror(errno));
+                        continue;
+                    }
+
+                    if(-1== shmdt(mem_ret)){
+                        printf("detach share memory false!\n");
+                        printf("err: %s\n", strerror(errno));
+                        continue;
+                    }
+                }
+                else {
+                    goto err;
+                }
+            }
+        }
+    }
+
+    if(1== g_work_model){
+        printf("operation is not suppored by this model!\n");
+        goto err;
+    }
+
 err:
     return -1;
 }
@@ -150,6 +202,7 @@ int shm_pull(IPC_FD mfd, SHARE_BUF_NODE *node)
 {
     node->share_size= ((SHARE_BUF_NODE*)g_shm_addr[mfd])->share_size;
     node->share_pt= ((SHARE_BUF_NODE*)g_shm_addr[mfd])->share_pt;
+    node->max_buf_size= ((SHARE_BUF_NODE*)g_shm_addr[mfd])->max_buf_size;
 
     return 0;
 
