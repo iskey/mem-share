@@ -3,6 +3,8 @@ cmake_minimum_required (VERSION 2.6)
 #Project Name
 project(mem-share)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 #source list
 set(TEST_PUSH_SRC
 	test_push.c #
@@ -19,7 +21,7 @@ set(CLEAR_MEM_SRC
 	mem-share.c
 )
 
-set(CMAKE_BUILD_TYPE Debug)
+include_directories(${PROJECT_SOURCE_DIR}/include/)
 
 #target
 add_executable(clr_mem ${CLEAR_MEM_SRC})
