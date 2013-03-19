@@ -1,12 +1,59 @@
+/******************************************************************************
+
+           This is Iskey.
+
+ ******************************************************************************/
+/**
+ * @file    mem-share.c
+ * @brief   mem-share functions
+ * @author  iskey@outlook.com
+ * @version Initial Draft
+ * @note    none
+ * @date    2013/3/19
+ */
+/******************************************************************************
+ *  Function List :
+ *              shm_chn_add
+ *              shm_chn_attach
+ *              shm_init
+ *              shm_pull
+ *              shm_push
+ *              shm_uinit
+ *  History       :
+ *  1.Date        : 2013/3/19
+ *    Author      : iskey
+ *    Modification: Created file
+ *
+******************************************************************************/
+
+/** external variables */
+
+/** external routine prototypes */
+
+/** internal routine prototypes */
+
+/** project-wide global variables */
+
+/** module-wide global variables */
+
+/** constants */
+
+/** macros */
+
+/** routines' implementations */
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <errno.h>
+#include <string.h>
 
 #include "mem-share.h"
 
+/* the maxinum share channel */
 #define MAX_NODE_NUM 10
+/* the shm base key value. */
 #define BASE_KEY 35
 
 /* variant to identify channels */
@@ -15,11 +62,25 @@ static int g_chn_indx= 0;
 static int g_work_model= 0;
 /* share memory address */
 static void *g_shm_addr[MAX_NODE_NUM]= {0};
-
+/* share memory keys */
 static key_t g_shmkey[MAX_NODE_NUM];
-
+/* share memory id. used by shm_uinit */
 static int g_shm_id[MAX_NODE_NUM];
 
+/**
+ * @brief init share memory.
+ * @param [in] int work_model  : 0:push model, 1:pull model.
+ * @param [out] None
+ * @return
+ * @note
+ *  Calls      :
+ *  Called By  :
+ *
+ *  History        :
+ *  1.Date         : 2013/3/19
+ *    Author       : iskey
+ *    Modification : Created function
+ */
 int shm_init(int work_model)
 {
     int i=0;
@@ -39,6 +100,20 @@ err:
     return -1;
 }
 /* add one transfer channel. */
+/**
+ * @brief add one memory share channel.
+ * @param [in] int max_buf_size  : the maxinum size of the share memory.
+ * @param [out] None
+ * @return
+ * @note
+ *  Calls      :
+ *  Called By  :
+ *
+ *  History        :
+ *  1.Date         : 2013/3/19
+ *    Author       : iskey
+ *    Modification : Created function
+ */
 IPC_FD shm_chn_add(int max_buf_size)
 {
     void *ret;
@@ -77,7 +152,20 @@ IPC_FD shm_chn_add(int max_buf_size)
 err:
     return -1;
 }
-/* add one transfer channel. */
+/**
+ * @brief delete all share channels in the memory.
+ * @param [in] None
+ * @param [out] None
+ * @return
+ * @note
+ *  Calls      :
+ *  Called By  :
+ *
+ *  History        :
+ *  1.Date         : 2013/3/19
+ *    Author       : iskey
+ *    Modification : Created function
+ */
 int shm_uinit()
 {
     int ret, tmp_indx;
@@ -128,7 +216,20 @@ int shm_uinit()
 err:
     return -1;
 }
-
+/**
+ * @brief attach one share channel.
+ * @param [in] void
+ * @param [out] None
+ * @return
+ * @note
+ *  Calls      :
+ *  Called By  : pullers.
+ *
+ *  History        :
+ *  1.Date         : 2013/3/19
+ *    Author       : iskey
+ *    Modification : Created function
+ */
 IPC_FD shm_chn_attach(void)
 {
     void *ret;
@@ -177,7 +278,21 @@ IPC_FD shm_chn_attach(void)
 err:
     return -1;
 }
-
+/**
+ * @brief push block of data to share channel.
+ * @param [in] IPC_FD mfd  : handler of the share channel.
+ * @param [in] SHARE_BUF_NODE *node  : data block structure.
+ * @param [out] None
+ * @return
+ * @note
+ *  Calls      :
+ *  Called By  :
+ *
+ *  History        :
+ *  1.Date         : 2013/3/19
+ *    Author       : iskey
+ *    Modification : Created function
+ */
 int shm_push(IPC_FD mfd, SHARE_BUF_NODE *node)
 {
     if((mfd< 0)&& (mfd> MAX_NODE_NUM)){
@@ -197,7 +312,21 @@ int shm_push(IPC_FD mfd, SHARE_BUF_NODE *node)
 err:
     return -1;
 }
-
+/**
+ * @brief pull block of data to share channel
+ * @param [in] IPC_FD mfd  : handler of the share channel
+ * @param [in] SHARE_BUF_NODE *node  : data block structure.
+ * @param [out] None
+ * @return
+ * @note
+ *  Calls      :
+ *  Called By  :
+ *
+ *  History        :
+ *  1.Date         : 2013/3/19
+ *    Author       : iskey
+ *    Modification : Created function
+ */
 int shm_pull(IPC_FD mfd, SHARE_BUF_NODE *node)
 {
     node->share_size= ((SHARE_BUF_NODE*)g_shm_addr[mfd])->share_size;
