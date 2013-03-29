@@ -50,10 +50,21 @@ extern "C"{
 #endif
 #endif /* End of #ifdef __cplusplus */
 
-extern int set_semvalue(void);
-extern void del_semvalue(void);
-extern int sem_p(void);
-extern int sem_v(void);
+/* create semaphore */
+extern int create_sem(int key_id, int count);
+/* delete semaphore */
+extern int free_sem(int semid);
+/* set semaphore value */
+extern int set_sem_value(int semid, int index, int value);
+/* get semaphore value */
+extern int get_sem_value(int semid, int index);
+/* block when semid[index] is negative and ms has not timeout. */
+extern int try_lock_sem(int semid, int index, int ms);
+/* block when sem[index] is negative, until it become plus */
+extern int lock_sem(int semid, int index);
+/* unlock semaphore */
+extern int unlock_sem(int semid, int index);
+
 
 #ifdef __cplusplus
 #if __cplusplus

@@ -49,9 +49,9 @@ typedef int IPC_FD;
 
 /* share memory type */
 typedef struct __SHARE_BUF_NODE__{
-    int max_buf_size;
-    int share_size;
-    void *share_pt;
+    int max_buf_size;//the share buffer size
+    int share_size;//the share block size in the share buffer
+    void *share_pt;//the share address
 }SHARE_BUF_NODE;
 
 /* init share memory */

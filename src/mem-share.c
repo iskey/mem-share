@@ -93,7 +93,7 @@ int shm_init(int work_model)
     g_work_model= work_model;
 
     for(i= 0; i< MAX_NODE_NUM; i++){
-        g_shmkey[i]= BASE_KEY+ i;
+        g_shmkey[i]= ftok(".", BASE_KEY+ i);
     }
 
 err:

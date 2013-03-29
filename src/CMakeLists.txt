@@ -21,9 +21,15 @@ set(CLEAR_MEM_SRC
 	mem-share.c
 )
 
+set(TEST_SEM_SRC
+	test_sem.c
+	sem.c
+)
+
 include_directories(${PROJECT_SOURCE_DIR}/include/)
 
 #target
 add_executable(clr_mem ${CLEAR_MEM_SRC})
 add_executable(test_pull ${TEST_PULL_SRC})
 add_executable(test_push ${TEST_PUSH_SRC})
+add_executable(test_sem ${TEST_SEM_SRC})
