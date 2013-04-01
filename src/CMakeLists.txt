@@ -24,6 +24,19 @@ set(CLEAR_MEM_SRC
 set(TEST_SEM_SRC
 	test_sem.c
 	sem.c
+	sem-share.c
+)
+
+set(TEST_SEM_TRG1
+	sem.c
+	sem-share.c
+	test_sem_trg1.c
+)
+
+set(TEST_SEM_TRG2
+	sem.c
+	sem-share.c
+	test_sem_trg2.c
 )
 
 include_directories(${PROJECT_SOURCE_DIR}/include/)
@@ -33,3 +46,5 @@ add_executable(clr_mem ${CLEAR_MEM_SRC})
 add_executable(test_pull ${TEST_PULL_SRC})
 add_executable(test_push ${TEST_PUSH_SRC})
 add_executable(test_sem ${TEST_SEM_SRC})
+add_executable(test_sem_trg1 ${TEST_SEM_TRG1})
+add_Executable(test_sem_trg2 ${TEST_SEM_TRG2})

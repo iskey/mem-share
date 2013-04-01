@@ -1,3 +1,11 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/sem.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <stdlib.h>
+#include <errno.h>
+
 #include "sem.h"
 #include "sem-share.h"
 
@@ -47,7 +55,7 @@ static int sem_trigger_create(int key)
     set_sem_value(sem_id, TRG_ID_0, 1);
     set_sem_value(sem_id, TRG_ID_1, 0);
 
-    return 0;
+    return sem_id;
 
 err:
     return -1;
@@ -61,7 +69,7 @@ static int sem_trigger_attach(int key)
         goto err;
     }
 
-    return 0;
+    return sem_id;
 
 err:
     return -1;
@@ -89,6 +97,8 @@ SEM_FD sem_trigger_add(int key)
 
     }
 
+    return ret;
+
 err:
     return -1;
 }
@@ -98,7 +108,7 @@ static int sem_trigger1_lock(int fd)
     int ret;
     ret= lock_sem(fd, TRG_ID_0);
     if(-1== ret){
-        printf("lock_sem error: %s", strerror(errno));
+        printf("lock_sem error: %s\n", strerror(errno));
         goto err;
     }
 
@@ -112,7 +122,7 @@ static int sem_trigger2_lock(int fd)
     int ret;
     ret= lock_sem(fd, TRG_ID_1);
     if(-1== ret){
-        printf("lock_sem error: %s", strerror(errno));
+        printf("lock_sem error: %s\n", strerror(errno));
         goto err;
     }
 
@@ -129,14 +139,14 @@ int sem_trigger_lock(SEM_FD sem_fd)
     }
 
     if(TRG_SERVER_MODEL== g_work_model){
-        if(-1== sem_trigger1_sig_get(sem_fd)){
-            printf("sem trigger create error: %s", strerror(errno));
+        if(-1== sem_trigger1_lock(sem_fd)){
+            printf("sem trigger lock error: %s\n", strerror(errno));
             goto err;
         }
     }
     else {
-        if(-1== sem_trigger2_sig_get(sem_fd)){
-            printf("sem trigger attach error: %s", strerror(errno));
+        if(-1== sem_trigger2_lock(sem_fd)){
+            printf("sem trigger lock error: %s\n", strerror(errno));
         }
 
     }
@@ -153,13 +163,13 @@ int sem_trigger_unlock(SEM_FD sem_fd)
     }
 
     if(TRG_SERVER_MODEL== g_work_model){
-        set_sem_value(sem_fd, TRG_ID_0, 1);
+        set_sem_value(sem_fd, TRG_ID_1, 1);
         if(-1== ret){
             goto err;
         }
     }
     else {
-        set_sem_value(sem_fd, TRG_ID_1, 1);
+        set_sem_value(sem_fd, TRG_ID_0, 1);
         if(-1== ret){
                 goto err;
         }

@@ -39,6 +39,8 @@
 #ifndef __SEM_SHARE__
 #define __SEM_SHARE__
 
+#include "sem.h"
+
 #ifdef __cplusplus
 #if __cplusplus
 extern "C"{
@@ -48,14 +50,14 @@ extern "C"{
 typedef int SEM_FD;
 
 /* init share memory */
-extern int sem_init(int work_model);
+extern int sem_trigger_init(int work_model);
 ///* delete share memory */
 //extern int sem_uinit();
 
 /* add one share channel. called by sender */
 extern SEM_FD sem_trigger_add(int key_id);
 /* attach one channel. called by receiver */
-extern SEM_FD sem_trigger_attach(int key_id);
+//extern SEM_FD sem_trigger_attach(int key_id);
 
 /* push block of data to share memory */
 extern sem_trigger_lock(SEM_FD sem_fd);
