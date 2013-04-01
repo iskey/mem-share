@@ -1,13 +1,13 @@
 #include "sem.h"
 #include "stdio.h"
 
-#define SEM_ID 11
+#define KEY_ID 11
 
 int main()
 {
     pid_t pid;
     int semid;
-    semid= create_sem(SEM_ID, 2);
+    semid= create_sem(KEY_ID, 2);
     set_sem_value(semid, 0, 1);
     set_sem_value(semid, 1, 0);
 
@@ -61,5 +61,6 @@ int main()
     }
 
     free_sem(semid);
+    printf("sem freed\n");
     return 0;
 }
