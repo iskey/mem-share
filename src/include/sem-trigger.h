@@ -39,7 +39,7 @@
 #ifndef __SEM_SHARE__
 #define __SEM_SHARE__
 
-#include "sem.h"
+#include "base-sem.h"
 
 #ifdef __cplusplus
 #if __cplusplus

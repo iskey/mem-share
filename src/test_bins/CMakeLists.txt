@@ -18,19 +18,19 @@ set(CLEAR_MEM_SRC
 
 set(TEST_SEM_SRC
 	test_sem.c
-	${PROJECT_SOURCE_DIR}/src/sem.c
-	${PROJECT_SOURCE_DIR}/src/sem-share.c
+	${PROJECT_SOURCE_DIR}/src/base-sem.c
+	${PROJECT_SOURCE_DIR}/src/sem-trigger.c
 )
 
 set(TEST_SEM_TRG1
-	${PROJECT_SOURCE_DIR}/src/sem.c
-	${PROJECT_SOURCE_DIR}/src/sem-share.c
+	${PROJECT_SOURCE_DIR}/src/base-sem.c
+	${PROJECT_SOURCE_DIR}/src/sem-trigger.c
 	test_sem_trg1.c
 )
 
 set(TEST_SEM_TRG2
-	${PROJECT_SOURCE_DIR}/src/sem.c
-	${PROJECT_SOURCE_DIR}/src/sem-share.c
+	${PROJECT_SOURCE_DIR}/src/base-sem.c
+	${PROJECT_SOURCE_DIR}/src/sem-trigger.c
 	test_sem_trg2.c
 )
 

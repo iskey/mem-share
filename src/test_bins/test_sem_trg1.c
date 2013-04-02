@@ -1,4 +1,4 @@
-#include "sem-share.h"
+#include "sem-trigger.h"
 #include "stdio.h"
 
 #define KEY_ID 11

@@ -6,8 +6,8 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#include "sem.h"
-#include "sem-share.h"
+#include "base-sem.h"
+#include "sem-trigger.h"
 
 #define TRG_SERVER_MODEL 0
 #define TRG_CLIENT_MODEL 1
