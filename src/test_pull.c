@@ -43,7 +43,7 @@
 
 void main()
 {
-    IPC_FD fd,fd1;
+    SHM_FD fd,fd1;
 
     shm_init(1);
     fd= shm_chn_attach();

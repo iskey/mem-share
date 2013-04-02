@@ -45,7 +45,7 @@ extern "C"{
 #endif
 #endif /* End of #ifdef __cplusplus */
 
-typedef int IPC_FD;
+typedef int SHM_FD;
 
 /* share memory type */
 typedef struct __SHARE_BUF_NODE__{
@@ -60,14 +60,14 @@ extern int shm_init(int work_model);
 extern int shm_uinit();
 
 /* add one share channel. called by sender */
-extern IPC_FD shm_chn_add(int max_buf_size);
+extern SHM_FD shm_chn_add(int max_buf_size);
 /* attach one channel. called by receiver */
-extern IPC_FD shm_chn_attach(void);
+extern SHM_FD shm_chn_attach(void);
 
 /* push block of data to share memory */
-extern shm_push(IPC_FD mfd, SHARE_BUF_NODE *node);
+extern shm_push(SHM_FD mfd, SHARE_BUF_NODE *node);
 /* pull block of data from share memory */
-extern shm_pull(IPC_FD mfd, SHARE_BUF_NODE *node);;
+extern shm_pull(SHM_FD mfd, SHARE_BUF_NODE *node);;
 
 #ifdef __cplusplus
 #if __cplusplus

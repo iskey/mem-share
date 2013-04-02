@@ -114,7 +114,7 @@ err:
  *    Author       : iskey
  *    Modification : Created function
  */
-IPC_FD shm_chn_add(int max_buf_size)
+SHM_FD shm_chn_add(int max_buf_size)
 {
     void *ret;
 
@@ -230,7 +230,7 @@ err:
  *    Author       : iskey
  *    Modification : Created function
  */
-IPC_FD shm_chn_attach(void)
+SHM_FD shm_chn_attach(void)
 {
     void *ret;
     int max_buf_size= 0;
@@ -280,7 +280,7 @@ err:
 }
 /**
  * @brief push block of data to share channel.
- * @param [in] IPC_FD mfd  : handler of the share channel.
+ * @param [in] SHM_FD mfd  : handler of the share channel.
  * @param [in] SHARE_BUF_NODE *node  : data block structure.
  * @param [out] None
  * @return
@@ -293,10 +293,10 @@ err:
  *    Author       : iskey
  *    Modification : Created function
  */
-int shm_push(IPC_FD mfd, SHARE_BUF_NODE *node)
+int shm_push(SHM_FD mfd, SHARE_BUF_NODE *node)
 {
     if((mfd< 0)&& (mfd> MAX_NODE_NUM)){
-        printf("IPC_FD may be not right!\n");
+        printf("SHM_FD may be not right!\n");
         goto err;
     }
     if(((node->share_size)<0)|| ((node->share_size)> ((SHARE_BUF_NODE *)g_shm_addr[mfd])->max_buf_size)){
@@ -314,7 +314,7 @@ err:
 }
 /**
  * @brief pull block of data to share channel
- * @param [in] IPC_FD mfd  : handler of the share channel
+ * @param [in] SHM_FD mfd  : handler of the share channel
  * @param [in] SHARE_BUF_NODE *node  : data block structure.
  * @param [out] None
  * @return
@@ -327,7 +327,7 @@ err:
  *    Author       : iskey
  *    Modification : Created function
  */
-int shm_pull(IPC_FD mfd, SHARE_BUF_NODE *node)
+int shm_pull(SHM_FD mfd, SHARE_BUF_NODE *node)
 {
     node->share_size= ((SHARE_BUF_NODE*)g_shm_addr[mfd])->share_size;
     node->share_pt= ((SHARE_BUF_NODE*)g_shm_addr[mfd])->share_pt;
