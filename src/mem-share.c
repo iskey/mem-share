@@ -50,6 +50,7 @@
 #include <string.h>
 
 #include "mem-share.h"
+#include "sem-trigger.h"
 
 /* the maxinum share channel */
 #define MAX_NODE_NUM 10
@@ -66,6 +67,8 @@ static void *g_shm_addr[MAX_NODE_NUM]= {0};
 static key_t g_shmkey[MAX_NODE_NUM];
 /* share memory id. used by shm_uinit */
 static int g_shm_id[MAX_NODE_NUM];
+/* sem trigger id */
+static SEM_FD g_sem_fd[MAX_NODE_NUM];
 
 /**
  * @brief init share memory.
@@ -84,14 +87,22 @@ static int g_shm_id[MAX_NODE_NUM];
 int shm_init(int work_model)
 {
     int i=0;
+    int ret;
 
+    /* check work model */
     if((0!= work_model)&& (1!= work_model)){
         printf("work model not supported!\n");
         goto err;
     }
     /* initial work model */
     g_work_model= work_model;
-
+    /* initial sem trigger */
+    ret= sem_trigger_init(work_model);
+    if(-1== ret){
+        printf("sem trigger error: %s\n", strerror(errno));
+        goto err;
+    }
+    /* initial shm key id. */
     for(i= 0; i< MAX_NODE_NUM; i++){
         g_shmkey[i]= ftok(".", BASE_KEY+ i);
     }
@@ -124,8 +135,11 @@ SHM_FD shm_chn_add(int max_buf_size)
         goto err;
     }
 
-    if(0== g_work_model)
+    if(0== g_work_model)//push model
     {
+        g_sem_fd[g_chn_indx]= sem_trigger_add(g_chn_indx);
+        printf("sem trigger %d added!\n", g_sem_fd[g_chn_indx]);
+
         g_shm_id[g_chn_indx]= shmget(g_shmkey[g_chn_indx], max_buf_size, 0777| IPC_CREAT);
         if(-1== g_shm_id[g_chn_indx]){
             printf("share memory get error! err:%s\n",strerror(errno));
@@ -142,7 +156,7 @@ SHM_FD shm_chn_add(int max_buf_size)
         ((SHARE_BUF_NODE *)g_shm_addr[g_chn_indx])->share_pt= ret+ sizeof(SHARE_BUF_NODE);
     }
 
-    if(1== g_work_model){
+    if(1== g_work_model){//pull model
         printf("operation is not suppored by this model!\n");
         printf("may try shm_chn_attach please!\n");
         goto err;
@@ -235,8 +249,11 @@ SHM_FD shm_chn_attach(void)
     void *ret;
     int max_buf_size= 0;
 
-    if(1== g_work_model)
+    if(1== g_work_model)//pull model
     {
+        g_sem_fd[g_chn_indx]= sem_trigger_add(g_chn_indx);
+        printf("sem trigger %d attached!\n", g_sem_fd[g_chn_indx]);
+
         g_shm_id[g_chn_indx]= shmget(g_shmkey[g_chn_indx], sizeof(SHARE_BUF_NODE), 0777| IPC_CREAT);
         if(-1== g_shm_id[g_chn_indx]){
             printf("share memory get error!\n");
@@ -267,7 +284,7 @@ SHM_FD shm_chn_attach(void)
         ((SHARE_BUF_NODE *)g_shm_addr[g_chn_indx])->share_pt= ret+ sizeof(SHARE_BUF_NODE);
     }
 
-    if(0== g_work_model){
+    if(0== g_work_model){//push model
         printf("operation is not suppored by this model!\n");
         printf("may try shm_chn_add please!\n");
         goto err;
@@ -295,6 +312,10 @@ err:
  */
 int shm_push(SHM_FD mfd, SHARE_BUF_NODE *node)
 {
+    if(-1== sem_trigger_lock(g_sem_fd[mfd])){
+        printf("sem trigger lock error! shm push operation may be not work properly");
+    }
+
     if((mfd< 0)&& (mfd> MAX_NODE_NUM)){
         printf("SHM_FD may be not right!\n");
         goto err;
@@ -329,6 +350,10 @@ err:
  */
 int shm_pull(SHM_FD mfd, SHARE_BUF_NODE *node)
 {
+    if(-1== sem_trigger_lock(g_sem_fd[mfd])){
+        printf("sem trigger lock error! shm push operation may be not work properly");
+    }
+
     node->share_size= ((SHARE_BUF_NODE*)g_shm_addr[mfd])->share_size;
     node->share_pt= ((SHARE_BUF_NODE*)g_shm_addr[mfd])->share_pt;
     node->max_buf_size= ((SHARE_BUF_NODE*)g_shm_addr[mfd])->max_buf_size;
@@ -338,3 +363,8 @@ int shm_pull(SHM_FD mfd, SHARE_BUF_NODE *node)
 err:
     return -1;
 }
+int shm_release(SHM_FD mfd)
+{
+    return(sem_trigger_unlock(g_sem_fd[mfd]));
+}
+

@@ -17,6 +17,7 @@ union semun{
 int create_sem(int key_id, int count)
 {
     key_t key;
+//    key= key_id;
     key= ftok(".", key_id);
 
     int semid;

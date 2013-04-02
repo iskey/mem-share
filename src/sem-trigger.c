@@ -97,6 +97,7 @@ SEM_FD sem_trigger_add(int key)
 
     }
 
+    printf("trigger sem id= %d\n", ret);
     return ret;
 
 err:
@@ -148,8 +149,9 @@ int sem_trigger_lock(SEM_FD sem_fd)
         if(-1== sem_trigger2_lock(sem_fd)){
             printf("sem trigger lock error: %s\n", strerror(errno));
         }
-
     }
+
+    return 0;
 
 err:
     return -1;

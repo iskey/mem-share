@@ -52,13 +52,21 @@ void main()
     SHARE_BUF_NODE *r_tmp;
     r_tmp= malloc(sizeof(SHARE_BUF_NODE));
 
-    shm_pull(fd, r_tmp);
-    printf("sahre mem buffer max size is %d\n",r_tmp->max_buf_size);
-    printf("share mem buffer size is %d\n",r_tmp->share_size);
-    printf("share mem buffer is %s\n",(unsigned char *)(r_tmp->share_pt));
+    int test= 20000;
+    while(test--)
+    {
+        shm_pull(fd, r_tmp);
+        printf("sahre mem buffer max size is %d\n",r_tmp->max_buf_size);
+        printf("share mem buffer size is %d\n",r_tmp->share_size);
+        printf("share mem buffer is %s times=%d\n",(unsigned char *)(r_tmp->share_pt), test);
+        shm_release(fd);
+    }
 
-    shm_pull(fd1, r_tmp);
-    printf("sahre mem buffer max size is %d\n",r_tmp->max_buf_size);
-    printf("share mem buffer size is %d\n",r_tmp->share_size);
-    printf("share mem buffer is %s\n",(unsigned char *)(r_tmp->share_pt));
+//    shm_pull(fd1, r_tmp);
+//    printf("sahre mem buffer max size is %d\n",r_tmp->max_buf_size);
+//    printf("share mem buffer size is %d\n",r_tmp->share_size);
+//    printf("share mem buffer is %s\n",(unsigned char *)(r_tmp->share_pt));
+//    shm_release(fd1);
+
+    getchar();
 }

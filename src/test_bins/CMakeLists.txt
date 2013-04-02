@@ -4,16 +4,22 @@ cmake_minimum_required (VERSION 2.6)
 set(TEST_PUSH_SRC
 	test_push.c #
 	${PROJECT_SOURCE_DIR}/src/mem-share.c
+	${PROJECT_SOURCE_DIR}/src/base-sem.c
+	${PROJECT_SOURCE_DIR}/src/sem-trigger.c
 )
 
 set(TEST_PULL_SRC
 	test_pull.c #
 	${PROJECT_SOURCE_DIR}/src/mem-share.c
+	${PROJECT_SOURCE_DIR}/src/base-sem.c
+	${PROJECT_SOURCE_DIR}/src/sem-trigger.c
 )
 
 set(CLEAR_MEM_SRC
 	clear_mem_share.c #
 	${PROJECT_SOURCE_DIR}/src/mem-share.c
+	${PROJECT_SOURCE_DIR}/src/base-sem.c
+	${PROJECT_SOURCE_DIR}/src/sem-trigger.c
 )
 
 set(TEST_SEM_SRC
