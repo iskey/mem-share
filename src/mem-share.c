@@ -88,16 +88,24 @@ int shm_init(int work_model)
 {
     int i=0;
     int ret;
+    int trg_model;
 
     /* check work model */
-    if((0!= work_model)&& (1!= work_model)){
+    if(PUSH_MODEL== work_model){
+        trg_model= TRG_SERVER_MODEL;
+    }
+    else if(PULL_MODEL== work_model){
+        trg_model= TRG_CLIENT_MODEL;
+    }
+    else {
         printf("work model not supported!\n");
         goto err;
     }
+
     /* initial work model */
     g_work_model= work_model;
     /* initial sem trigger */
-    ret= sem_trigger_init(work_model);
+    ret= sem_trigger_init(trg_model);
     if(-1== ret){
         printf("sem trigger error: %s\n", strerror(errno));
         goto err;
@@ -135,7 +143,7 @@ SHM_FD shm_chn_add(int max_buf_size)
         goto err;
     }
 
-    if(0== g_work_model)//push model
+    if(PUSH_MODEL== g_work_model)//push model
     {
         g_sem_fd[g_chn_indx]= sem_trigger_add(g_chn_indx);
         printf("sem trigger %d added!\n", g_sem_fd[g_chn_indx]);
@@ -156,7 +164,7 @@ SHM_FD shm_chn_add(int max_buf_size)
         ((SHARE_BUF_NODE *)g_shm_addr[g_chn_indx])->share_pt= ret+ sizeof(SHARE_BUF_NODE);
     }
 
-    if(1== g_work_model){//pull model
+    if(PULL_MODEL== g_work_model){//pull model
         printf("operation is not suppored by this model!\n");
         printf("may try shm_chn_attach please!\n");
         goto err;
@@ -185,7 +193,7 @@ int shm_uinit()
     int ret, tmp_indx;
     struct shmid_ds buf;
 
-    if(0== g_work_model)
+    if(PUSH_MODEL== g_work_model)
     {
         for(tmp_indx=0; tmp_indx< MAX_NODE_NUM; tmp_indx++)
         {
@@ -222,7 +230,7 @@ int shm_uinit()
         }
     }
 
-    if(1== g_work_model){
+    if(PULL_MODEL== g_work_model){
         printf("operation is not suppored by this model!\n");
         goto err;
     }
@@ -246,45 +254,51 @@ err:
  */
 SHM_FD shm_chn_attach(void)
 {
-    void *ret;
+    void *shm_addr_pt;
+    int ret;
     int max_buf_size= 0;
 
-    if(1== g_work_model)//pull model
+    if(PULL_MODEL== g_work_model)//pull model
     {
         g_sem_fd[g_chn_indx]= sem_trigger_add(g_chn_indx);
         printf("sem trigger %d attached!\n", g_sem_fd[g_chn_indx]);
 
-        g_shm_id[g_chn_indx]= shmget(g_shmkey[g_chn_indx], sizeof(SHARE_BUF_NODE), 0777| IPC_CREAT);
+        /////********* get SHARE_BUF_NODE structure *************/
+        /* we donot konw how many byte to get, so we get SHARE_BUF_NODE
+           sturcture first */
+        g_shm_id[g_chn_indx]= shmget(g_shmkey[g_chn_indx], sizeof(SHARE_BUF_NODE), 0);
+        if(-1== g_shm_id[g_chn_indx]){
+            printf("share memory may not created by pusher yet. you need to try this later.\n");
+            goto err;
+        }
+        /* map the memory address */
+        shm_addr_pt= shmat(g_shm_id[g_chn_indx], 0, 0);
+        if((void *)-1== shm_addr_pt){
+            printf("share memory attach address error.\n");
+            goto err;
+        }
+        /* get the maximum size of the share buffer */
+        max_buf_size= ((SHARE_BUF_NODE*)shm_addr_pt)->max_buf_size;
+        /////********* end get SHARE_BUF_NODE structure **********/
+
+        /////********* get the real structure *************/
+        g_shm_id[g_chn_indx]= shmget(g_shmkey[g_chn_indx], max_buf_size, 0);
         if(-1== g_shm_id[g_chn_indx]){
             printf("share memory get error!\n");
             goto err;
         }
 
-        ret= shmat(g_shm_id[g_chn_indx], 0, 0);
-        if((void *)-1== ret){
+        shm_addr_pt= shmat(g_shm_id[g_chn_indx], 0, 0);
+        if((void *)-1== shm_addr_pt){
             printf("share memory attach address error\n");
             goto err;
         }
-
-        max_buf_size= ((SHARE_BUF_NODE*)ret)->max_buf_size;
-
-        g_shm_id[g_chn_indx]= shmget(g_shmkey[g_chn_indx], max_buf_size, 0777| IPC_CREAT);
-        if(-1== g_shm_id[g_chn_indx]){
-            printf("share memory get error!\n");
-            goto err;
-        }
-
-        ret= shmat(g_shm_id[g_chn_indx], 0, 0);
-        if((void *)-1== ret){
-            printf("share memory attach address error\n");
-            goto err;
-        }
-
-        g_shm_addr[g_chn_indx]= ret;
-        ((SHARE_BUF_NODE *)g_shm_addr[g_chn_indx])->share_pt= ret+ sizeof(SHARE_BUF_NODE);
+        /////********* end get the real structure *********/
+        g_shm_addr[g_chn_indx]= shm_addr_pt;
+        ((SHARE_BUF_NODE *)g_shm_addr[g_chn_indx])->share_pt= shm_addr_pt+ sizeof(SHARE_BUF_NODE);
     }
 
-    if(0== g_work_model){//push model
+    if(PUSH_MODEL== g_work_model){//push model
         printf("operation is not suppored by this model!\n");
         printf("may try shm_chn_add please!\n");
         goto err;

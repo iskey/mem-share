@@ -45,6 +45,9 @@ extern "C"{
 #endif
 #endif /* End of #ifdef __cplusplus */
 
+#define PUSH_MODEL 0
+#define PULL_MODEL 1
+
 typedef int SHM_FD;
 
 /* share memory type */
