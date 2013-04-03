@@ -11,7 +11,7 @@ int main()
 
     int ret;
     SEM_FD fd;
-    sem_trigger_init(0);
+    sem_trigger_init(TRG_SERVER_MODEL);
     fd= sem_trigger_add(KEY_ID);
 
     srand((int)time(0));

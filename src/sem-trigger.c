@@ -9,10 +9,6 @@
 #include "base-sem.h"
 #include "sem-trigger.h"
 
-#define TRG_SERVER_MODEL 0
-#define TRG_CLIENT_MODEL 1
-#define TRG_MODEL_NOT_SUPPORT 0xff
-
 #define TRG_SERVER_ID 0
 #define TRG_CLIENT_ID 1
 
@@ -140,12 +136,14 @@ int sem_trigger_lock(SEM_FD sem_fd)
     }
 
     if(TRG_SERVER_MODEL== g_work_model){
+        printf("current sem %d index %d value is %d\n", sem_fd, TRG_SERVER_ID, get_sem_value(sem_fd, TRG_SERVER_ID));
         if(-1== sem_trigger_server_lock(sem_fd)){
             printf("sem trigger lock error: %s\n", strerror(errno));
             goto err;
         }
     }
     else {
+        printf("current sem %d index %d value is %d\n", sem_fd, TRG_CLIENT_ID, get_sem_value(sem_fd, TRG_CLIENT_ID));
         if(-1== sem_trigger_client_lock(sem_fd)){
             printf("sem trigger lock error: %s\n", strerror(errno));
         }

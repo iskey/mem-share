@@ -47,6 +47,10 @@ extern "C"{
 #endif
 #endif /* End of #ifdef __cplusplus */
 
+#define TRG_SERVER_MODEL 0
+#define TRG_CLIENT_MODEL 1
+#define TRG_MODEL_NOT_SUPPORT 0xff
+
 typedef int SEM_FD;
 
 /* init share memory */
