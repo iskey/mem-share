@@ -70,7 +70,9 @@ extern SHM_FD shm_chn_attach(void);
 /* push block of data to share memory */
 extern shm_push(SHM_FD mfd, SHARE_BUF_NODE *node);
 /* pull block of data from share memory */
-extern shm_pull(SHM_FD mfd, SHARE_BUF_NODE *node);;
+extern shm_pull(SHM_FD mfd, SHARE_BUF_NODE *node);
+/* release handler returned by shm_pull */
+extern shm_release(int fd);
 
 #ifdef __cplusplus
 #if __cplusplus

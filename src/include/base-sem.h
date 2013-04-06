@@ -52,6 +52,8 @@ extern "C"{
 
 /* create semaphore */
 extern int create_sem(int key_id, int count);
+/* attach semaphore */
+extern int attach_sem(int key_id, int count);
 /* delete semaphore */
 extern int free_sem(int semid);
 /* set semaphore value */

@@ -62,12 +62,11 @@ void main()
 
     tmp->share_size= sizeof("WWffffffffffffffffWXXXJKOJKOO");
     tmp->share_pt= "WWffffffffffffffffWXXXJKOJKOO";
-
+    
     int test= 20000;
     while(test--)
     {
         shm_push(fd, tmp);
-        shm_release(fd);
         printf("share channel %d is pushed successfully by share size= %d times=%d\n",fd,tmp->share_size, test);
     }
 

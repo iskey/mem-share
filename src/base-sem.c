@@ -28,6 +28,21 @@ int create_sem(int key_id, int count)
 
     return semid;
 }
+/* create semaphore */
+int attach_sem(int key_id, int count)
+{
+    key_t key;
+//    key= key_id;
+    key= ftok(".", key_id);
+
+    int semid;
+    semid= semget(key, count, 0);
+    if(-1== semid){
+        printf("create sem error: %s, semid= %d\n", strerror(errno), semid);
+    }
+
+    return semid;
+}
 /* delete semaphore */
 int free_sem(int semid)
 {

@@ -59,7 +59,7 @@ err:
 static int sem_trigger_attach(int key)
 {
     int sem_id;
-    sem_id= create_sem(key, 2);
+    sem_id= attach_sem(key, 2);
     if(-1== sem_id){
         printf("create sem error: %s\n",strerror(errno));
         goto err;
@@ -84,13 +84,14 @@ SEM_FD sem_trigger_add(int key)
             printf("sem trigger create error: %s", strerror(errno));
             goto err;
         }
+        printf("sem trigger create : index %d = %d, index %d = %d\n", TRG_CLIENT_ID, get_sem_value(ret, TRG_CLIENT_ID), TRG_SERVER_ID, get_sem_value(ret, TRG_CLIENT_ID));
     }
     else {
         ret= sem_trigger_attach(key);
         if(-1== ret){
             printf("sem trigger attach error: %s", strerror(errno));
         }
-
+        printf("sem trigger attach : index %d = %d, index %d = %d\n", TRG_CLIENT_ID, get_sem_value(ret, TRG_CLIENT_ID), TRG_SERVER_ID, get_sem_value(ret, TRG_CLIENT_ID));
     }
 
     printf("trigger sem id= %d\n", ret);

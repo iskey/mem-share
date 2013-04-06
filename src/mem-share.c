@@ -340,8 +340,10 @@ int shm_push(SHM_FD mfd, SHARE_BUF_NODE *node)
     }
 
     ((SHARE_BUF_NODE *)g_shm_addr[mfd])->share_size= node->share_size;
-    memcpy(((SHARE_BUF_NODE *)g_shm_addr[mfd])->share_pt, node->share_pt, node->share_size);
+    memcpy(g_shm_addr[mfd]+ sizeof(SHARE_BUF_NODE), node->share_pt, node->share_size);
 
+    shm_release(mfd);
+    
     return 0;
 
 err:
@@ -369,16 +371,17 @@ int shm_pull(SHM_FD mfd, SHARE_BUF_NODE *node)
     }
 
     node->share_size= ((SHARE_BUF_NODE*)g_shm_addr[mfd])->share_size;
-    node->share_pt= ((SHARE_BUF_NODE*)g_shm_addr[mfd])->share_pt;
+    node->share_pt= g_shm_addr[mfd]+ sizeof(SHARE_BUF_NODE);
     node->max_buf_size= ((SHARE_BUF_NODE*)g_shm_addr[mfd])->max_buf_size;
 
-    return 0;
+    return mfd;
 
 err:
     return -1;
 }
-int shm_release(SHM_FD mfd)
+int shm_release(int fd)
 {
+    SHM_FD mfd= fd;
     return(sem_trigger_unlock(g_sem_fd[mfd]));
 }
 
