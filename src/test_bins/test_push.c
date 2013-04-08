@@ -39,7 +39,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
 
 #include "mem-share.h"
 
@@ -52,12 +51,13 @@ void main(int argc, char* argv[])
     }
     
     char rd_buf[5000];//input buffer
-    int file_fd;//input file path
+    FILE* file_fd;//input file path
     ssize_t share_size;//read size
     
-    file_fd= open(argv[1], O_RDONLY);//open file
-    if(-1== file_fd){
+    file_fd= fopen(argv[1], "rb");//open file
+    if(NULL== file_fd){
         printf("file open error!\n");
+        return;
     }
     
     SHARE_BUF_NODE *tmp;
@@ -75,7 +75,7 @@ void main(int argc, char* argv[])
     while(1)
     {
         /* read file from input file */
-        share_size= read(file_fd, rd_buf, 5000);
+        share_size= fread(rd_buf, 1, 5000, file_fd);
         if(0>= share_size){
             if(-1== share_size){
                 printf("read file error!\n");              

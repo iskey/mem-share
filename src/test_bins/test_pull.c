@@ -40,7 +40,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fcntl.h>
 #include "mem-share.h"
 
 void main(int argc, char* argv[])
@@ -57,11 +56,11 @@ void main(int argc, char* argv[])
         printf("usage: test_pull filename!\n");
     }
     
-    int file_fd;//output file path
+    FILE* file_fd;//output file path
     ssize_t wr_size;//write size 
     
-    file_fd= open(argv[1], O_RDWR| O_CREAT);//open output file
-    if(-1== file_fd){
+    file_fd= fopen(argv[1], "wb");//open output file
+    if(NULL== file_fd){
         printf("file open error!\n");
         return;
     }
@@ -70,14 +69,17 @@ void main(int argc, char* argv[])
     {
         int handle= shm_pull(fd, r_tmp);//pull data from shm channel
 
-        wr_size= write(file_fd, r_tmp->share_pt, r_tmp->share_size);//write data to output file
+        wr_size= fwrite(r_tmp->share_pt, 1, r_tmp->share_size, file_fd);//write data to output file
         if(-1== wr_size){
             printf("write error!\n");
             return ;
         }
         printf("share mem buffer size is %d\n",r_tmp->share_size);
         shm_release(handle);
+        
+        if(5000!= wr_size){
+            fclose(file_fd);
+            return;
+        }
     }
-
-    getchar();
 }
