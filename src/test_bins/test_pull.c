@@ -40,38 +40,44 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
 #include "mem-share.h"
 
-void main()
+void main(int argc, char* argv[])
 {
     SHM_FD fd,fd1;
 
     shm_init(1);
     fd= shm_chn_attach();
-//    fd1= shm_chn_attach();
 
     SHARE_BUF_NODE *r_tmp;
     r_tmp= malloc(sizeof(SHARE_BUF_NODE));
     
-    char *pull_buf;
-    pull_buf= malloc(500);
-
-    int test= 20000;
-    while(test--)
+    if(argc< 2){
+        printf("usage: test_pull filename!\n");
+    }
+    
+    int file_fd;//output file path
+    ssize_t wr_size;//write size 
+    
+    file_fd= open(argv[1], O_RDWR| O_CREAT);//open output file
+    if(-1== file_fd){
+        printf("file open error!\n");
+        return;
+    }
+    
+    while(1)
     {
-        int handle= shm_pull(fd, r_tmp);
-        memcpy((void *)pull_buf, (const void *)(r_tmp->share_pt), (r_tmp->share_size));
-        printf("sahre mem buffer max size is %d\n",r_tmp->max_buf_size);
+        int handle= shm_pull(fd, r_tmp);//pull data from shm channel
+
+        wr_size= write(file_fd, r_tmp->share_pt, r_tmp->share_size);//write data to output file
+        if(-1== wr_size){
+            printf("write error!\n");
+            return ;
+        }
         printf("share mem buffer size is %d\n",r_tmp->share_size);
-        printf("share mem buffer is %s times=%d\n",pull_buf, test);
         shm_release(handle);
     }
-
-//    shm_pull(fd1, r_tmp);
-//    printf("sahre mem buffer max size is %d\n",r_tmp->max_buf_size);
-//    printf("share mem buffer size is %d\n",r_tmp->share_size);
-//    printf("share mem buffer is %s\n",(unsigned char *)(r_tmp->share_pt));
-//    shm_release(fd1);
 
     getchar();
 }
