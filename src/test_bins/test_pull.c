@@ -51,20 +51,20 @@ void main(int argc, char* argv[])
 
     SHARE_BUF_NODE *r_tmp;
     r_tmp= malloc(sizeof(SHARE_BUF_NODE));
-    
+
     if(argc< 2){
         printf("usage: test_pull filename!\n");
     }
-    
+
     FILE* file_fd;//output file path
-    ssize_t wr_size;//write size 
-    
+    ssize_t wr_size;//write size
+
     file_fd= fopen(argv[1], "wb");//open output file
     if(NULL== file_fd){
         printf("file open error!\n");
         return;
     }
-    
+
     while(1)
     {
         int handle= shm_pull(fd, r_tmp);//pull data from shm channel
@@ -74,9 +74,9 @@ void main(int argc, char* argv[])
             printf("write error!\n");
             return ;
         }
-        printf("share mem buffer size is %d\n",r_tmp->share_size);
+//        printf("share mem buffer size is %d\n",r_tmp->share_size);
         shm_release(handle);
-        
+
         if(5000!= wr_size){
             fclose(file_fd);
             return;

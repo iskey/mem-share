@@ -45,24 +45,24 @@
 void main(int argc, char* argv[])
 {
     SHM_FD fd;
-    
+
     if(argc< 2){//check args
         printf("usage: test_push filename!\n");
     }
-    
+
     char rd_buf[5000];//input buffer
     FILE* file_fd;//input file path
     ssize_t share_size;//read size
-    
+
     file_fd= fopen(argv[1], "rb");//open file
     if(NULL== file_fd){
         printf("file open error!\n");
         return;
     }
-    
+
     SHARE_BUF_NODE *tmp;
     tmp= malloc(sizeof(SHARE_BUF_NODE));
-    
+
     /* Initial shm modle */
     shm_init(0);
     /* add shm channel with max buffer size */
@@ -78,7 +78,7 @@ void main(int argc, char* argv[])
         share_size= fread(rd_buf, 1, 5000, file_fd);
         if(0>= share_size){
             if(-1== share_size){
-                printf("read file error!\n");              
+                printf("read file error!\n");
             }
             else if(0== share_size){
                 printf("push successfully!\n");
@@ -89,7 +89,7 @@ void main(int argc, char* argv[])
         tmp->share_pt= rd_buf;
         tmp->share_size= share_size;
         shm_push(fd, tmp);
-        printf("share channel %d is pushed successfully by share size= %d\n", fd, tmp->share_size);
+//        printf("share channel %d is pushed successfully by share size= %d\n", fd, tmp->share_size);
     }
 
     getchar();

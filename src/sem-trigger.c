@@ -12,6 +12,9 @@
 #define TRG_SERVER_ID 0
 #define TRG_CLIENT_ID 1
 
+//#define SEM_DEBUG /* for debug model */
+#define SEM_OPTIMIZE /* for optimize */
+
 /* 0:trigger 1, 1:trigger 2 */
 static int g_work_model= TRG_MODEL_NOT_SUPPORT;
 
@@ -93,8 +96,9 @@ SEM_FD sem_trigger_add(int key)
         }
         printf("sem trigger attach : index %d = %d, index %d = %d\n", TRG_CLIENT_ID, get_sem_value(ret, TRG_CLIENT_ID), TRG_SERVER_ID, get_sem_value(ret, TRG_CLIENT_ID));
     }
-
+#ifdef SEM_DEBUG
     printf("trigger sem id= %d\n", ret);
+#endif
     return ret;
 
 err:
@@ -132,19 +136,25 @@ err:
 int sem_trigger_lock(SEM_FD sem_fd)
 {
     int ret;
+#ifndef SEM_OPTIMIZE
     if(-1== sem_trigger_check()){
         goto err;
     }
+#endif
 
     if(TRG_SERVER_MODEL== g_work_model){
+#ifdef SEM_DEBUG
         printf("current sem %d index %d value is %d\n", sem_fd, TRG_SERVER_ID, get_sem_value(sem_fd, TRG_SERVER_ID));
+#endif
         if(-1== sem_trigger_server_lock(sem_fd)){
             printf("sem trigger lock error: %s\n", strerror(errno));
             goto err;
         }
     }
     else {
+#ifdef SEM_DEBUG
         printf("current sem %d index %d value is %d\n", sem_fd, TRG_CLIENT_ID, get_sem_value(sem_fd, TRG_CLIENT_ID));
+#endif
         if(-1== sem_trigger_client_lock(sem_fd)){
             printf("sem trigger lock error: %s\n", strerror(errno));
         }
@@ -159,9 +169,11 @@ err:
 int sem_trigger_unlock(SEM_FD sem_fd)
 {
     int ret;
+#ifndef SEM_OPTIMIZE
     if(-1== sem_trigger_check()){
         goto err;
     }
+#endif
 
     if(TRG_SERVER_MODEL== g_work_model){
         set_sem_value(sem_fd, TRG_CLIENT_ID, 1);
