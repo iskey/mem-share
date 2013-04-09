@@ -64,9 +64,9 @@ void main(int argc, char* argv[])
     tmp= malloc(sizeof(SHARE_BUF_NODE));
 
     /* Initial shm modle */
-    shm_init(0);
+    shm_init(SHM_PUSH_MODEL);
     /* add shm channel with max buffer size */
-    fd= shm_chn_add(800000);
+    fd= shm_chn_add(3,800000);
     if(-1== fd){
         printf("shm channel add error!\n");
         return;

@@ -45,8 +45,8 @@ extern "C"{
 #endif
 #endif /* End of #ifdef __cplusplus */
 
-#define PUSH_MODEL 0
-#define PULL_MODEL 1
+#define SHM_PUSH_MODEL 0
+#define SHM_PULL_MODEL 1
 
 typedef int SHM_FD;
 
@@ -63,16 +63,16 @@ extern int shm_init(int work_model);
 extern int shm_uinit();
 
 /* add one share channel. called by sender */
-extern SHM_FD shm_chn_add(int max_buf_size);
+extern SHM_FD shm_chn_add(int chn_indx, int max_buf_size);
 /* attach one channel. called by receiver */
-extern SHM_FD shm_chn_attach(void);
+extern SHM_FD shm_chn_attach(int chn_indx);
 
 /* push block of data to share memory */
-extern shm_push(SHM_FD mfd, SHARE_BUF_NODE *node);
+extern int shm_push(SHM_FD mfd, SHARE_BUF_NODE *node);
 /* pull block of data from share memory */
-extern shm_pull(SHM_FD mfd, SHARE_BUF_NODE *node);
+extern int shm_pull(SHM_FD mfd, SHARE_BUF_NODE *node);
 /* release handler returned by shm_pull */
-extern shm_release(int fd);
+extern int shm_release(int fd);
 
 #ifdef __cplusplus
 #if __cplusplus
