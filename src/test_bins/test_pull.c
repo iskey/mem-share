@@ -47,7 +47,10 @@ void main(int argc, char* argv[])
     SHM_FD fd,fd1;
 
     shm_init(SHM_PULL_MODEL);
-    fd= shm_chn_attach(3);
+    do{
+        fd= shm_chn_attach(3);
+        sleep(1);
+    }while(-1== fd);
 
     SHARE_BUF_NODE *r_tmp;
     r_tmp= malloc(sizeof(SHARE_BUF_NODE));
