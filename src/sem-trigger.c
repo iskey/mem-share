@@ -5,6 +5,7 @@
 #include <sys/ipc.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <string.h>
 
 #include "base-sem.h"
 #include "sem-trigger.h"
