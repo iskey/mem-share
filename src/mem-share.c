@@ -145,7 +145,7 @@ SHM_FD shm_chn_add(int chn_indx, int max_buf_size)
     if(SHM_PUSH_MODEL== g_work_model)//push model
     {
         g_sem_fd[chn_indx]= sem_trigger_add(chn_indx);
-        printf("sem trigger %d added!\n", g_sem_fd[chn_indx]);
+        printf("sem trigger %d , key= %d added!\n", chn_indx, g_sem_fd[chn_indx]);
 
         g_shm_id[chn_indx]= shmget(g_shmkey[chn_indx], max_buf_size, 0777| IPC_CREAT);
         if(-1== g_shm_id[chn_indx]){
@@ -169,7 +169,7 @@ SHM_FD shm_chn_add(int chn_indx, int max_buf_size)
         goto err;
     }
 
-    return chn_indx++;
+    return chn_indx;
 err:
     return -1;
 }
