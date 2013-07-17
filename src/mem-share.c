@@ -152,7 +152,8 @@ SHM_FD shm_chn_add(int chn_indx, int max_buf_size)
             printf("share memory get error! err:%s\n",strerror(errno));
             goto err;
         }
-
+        printf("shm index %d create successfully with max_buf_size %d\n", chn_indx, max_buf_size);
+        
         ret= shmat(g_shm_id[chn_indx], 0, 0);
         if((void *)-1== ret){
             printf("share memory attach address error\n");
@@ -332,7 +333,7 @@ int shm_push(SHM_FD mfd, SHARE_BUF_NODE *node)
         goto err;
     }
     if(((node->share_size)<0)|| ((node->share_size)> ((SHARE_BUF_NODE *)g_shm_addr[mfd])->max_buf_size)){
-        printf("node buffer size is too big!\n");
+        printf("node buffer size is too big! --- share size is %d\n", node->share_size);
         goto err;
     }
 
