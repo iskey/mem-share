@@ -7,6 +7,9 @@
 #include <errno.h>
 #include <string.h>
 
+/* to avoid implicit declaration warnings */
+extern int semtimedop(int semid, struct sembuf *sops, unsigned nsops,struct timespec *timeout);
+
 union semun{
     int val;
     struct semid_ds *buf;

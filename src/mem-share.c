@@ -112,6 +112,8 @@ int shm_init(int work_model)
         g_shmkey[i]= ftok(".", BASE_KEY+ i);
     }
 
+    return 0;
+
 err:
     return -1;
 }
@@ -188,7 +190,6 @@ err:
 int shm_uinit()
 {
     int ret, tmp_indx;
-    struct shmid_ds buf;
 
     if(SHM_PUSH_MODEL== g_work_model)
     {
@@ -252,7 +253,6 @@ err:
 SHM_FD shm_chn_attach(int chn_indx)
 {
     void *shm_addr_pt;
-    int ret;
     int max_buf_size= 0;
 
     if(SHM_PULL_MODEL== g_work_model)//pull model
@@ -372,9 +372,6 @@ int shm_pull(SHM_FD mfd, SHARE_BUF_NODE *node)
     node->max_buf_size= ((SHARE_BUF_NODE*)g_shm_addr[mfd])->max_buf_size;
 
     return mfd;
-
-err:
-    return -1;
 }
 int shm_release(int fd)
 {

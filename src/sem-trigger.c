@@ -136,7 +136,6 @@ err:
 }
 int sem_trigger_lock(SEM_FD sem_fd)
 {
-    int ret;
 #ifndef SEM_OPTIMIZE
     if(-1== sem_trigger_check()){
         goto err;
@@ -177,13 +176,13 @@ int sem_trigger_unlock(SEM_FD sem_fd)
 #endif
 
     if(TRG_SERVER_MODEL== g_work_model){
-        set_sem_value(sem_fd, TRG_CLIENT_ID, 1);
+        ret= set_sem_value(sem_fd, TRG_CLIENT_ID, 1);
         if(-1== ret){
             goto err;
         }
     }
     else {
-        set_sem_value(sem_fd, TRG_SERVER_ID, 1);
+        ret= set_sem_value(sem_fd, TRG_SERVER_ID, 1);
         if(-1== ret){
                 goto err;
         }
